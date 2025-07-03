@@ -1,0 +1,24 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "environmentName": {
+      "value": "mywebapp"
+    },
+    "location": {
+      "value": "japaneast"
+    },
+    "appServicePlanSku": {
+      "value": "P1v3"
+    },
+    "sqlDatabaseSku": {
+      "value": "S1"
+    },
+    "enableApplicationGateway": {
+      "value": true
+    },
+    "containerImageTag": {
+      "value": "latest"
+    }
+  }
+}
