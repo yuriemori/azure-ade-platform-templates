@@ -1,199 +1,140 @@
-# Azure Deployment Environments Catalog
+# Azure Deployment Environments カタログ
 
-This catalog contains environment definitions for Azure Deployment Environments (ADE), enabling developers to self-service deploy complete application infrastructure.
+このカタログには、Azure Deployment Environments (ADE) の環境定義が含まれており、開発者が完全なアプリケーションインフラストラクチャをセルフサービスでデプロイできます。
 
-## Catalog Structure
+## カタログ構造
 
 ```
 ade-catalog/
-├── README.md                    # This file
-├── ADE-SETUP.md                # Complete setup guide
-└── environment-definitions/     # Environment definitions
-    └── secure-webapp/          # Secure web application environment
-        ├── manifest.yaml       # Environment metadata
-        ├── main.bicep         # Infrastructure as Code template
-        └── README.md          # Environment documentation
+├── README.md                    # このファイル
+├── ADE-SETUP.md                # 完全なセットアップガイド
+└── environment-definitions/     # 環境定義
+    └── secure-webapp/          # セキュアなWebアプリケーション環境
+        └── main.bicep         # Infrastructure as Code テンプレート
 ```
 
-## Environment Definitions
+## 環境定義
 
-### Secure Web Application (`secure-webapp`)
+### セキュアWebアプリケーション (`secure-webapp`)
 
-A complete, production-ready web application environment following Azure security best practices.
+Azureセキュリティのベストプラクティスに従った、完全な本番対応Webアプリケーション環境です。
 
-**Components:**
-- Frontend and Backend App Services (containerized)
-- Azure SQL Database with private connectivity
-- Azure Key Vault for secrets management
-- Application Gateway with Web Application Firewall
-- Application Insights for monitoring
-- Virtual Network with proper segmentation
-- Managed Identity for passwordless authentication
+**コンポーネント:**
+- フロントエンドおよびバックエンドApp Services（コンテナ化）
+- プライベート接続でのAzure SQL Database
+- シークレット管理のためのAzure Key Vault
+- Web Application FirewallでのApplication Gateway
+- 監視のためのApplication Insights
+- 適切にセグメント化されたVirtual Network
+- パスワードレス認証のためのManaged Identity
 
-**Use Cases:**
-- Full-stack web applications
-- Microservices architectures
-- Secure enterprise applications
-- Development, staging, and production environments
+**使用例:**
+- フルスタックWebアプリケーション
+- マイクロサービスアーキテクチャ
+- セキュアなエンタープライズアプリケーション
+- 開発、ステージング、本番環境
 
-## Getting Started
+## はじめに
 
-1. **Setup**: Follow the [ADE-SETUP.md](./ADE-SETUP.md) guide to configure Azure Deployment Environments
-2. **Deploy**: Use the Developer Portal or Azure CLI to create environments
-3. **Customize**: Modify templates to meet your specific requirements
+1. **セットアップ**: [ADE-SETUP.md](./ADE-SETUP.md) ガイドに従ってAzure Deployment Environmentsを設定
+2. **デプロイ**: Developer PortalまたはAzure CLIを使用して環境を作成
+3. **カスタマイズ**: 特定の要件に合わせてテンプレートを変更
 
-## Key Features
+## 主要機能
 
-### Security First
-- Managed Identity for all service authentication
-- Private endpoints for database and key vault access
-- VNet integration for network isolation
-- Web Application Firewall protection
-- RBAC for fine-grained access control
+### セキュリティファースト
+- すべてのサービス認証にManaged Identity
+- データベースとKey Vaultアクセス用のプライベートエンドポイント
+- ネットワーク分離のためのVNet統合
+- Web Application Firewall保護
+- きめ細かなアクセス制御のためのRBAC
 
-### Production Ready
-- Auto-scaling capabilities
-- High availability configurations
-- Comprehensive monitoring and logging
-- Disaster recovery considerations
-- Cost optimization features
+### 本番対応
+- 自動スケーリング機能
+- 高可用性設定
+- 包括的な監視とログ記録
+- 災害復旧の考慮
+- コスト最適化機能
 
-### Developer Friendly
-- Self-service deployment through Developer Portal
-- Parameterized templates for different environments
-- Clear documentation and examples
-- Consistent naming conventions
+### 開発者フレンドリー
+- Developer Portalを通じたセルフサービスデプロイメント
+- 異なる環境用のパラメータ化テンプレート
+- 明確なドキュメントと例
+- 一貫した命名規則
 
-## Template Standards
+## テンプレート標準
 
-All environment definitions in this catalog follow these standards:
+このカタログのすべての環境定義は以下の標準に従います：
 
-### File Structure
-- `manifest.yaml`: Environment metadata and parameters
-- `main.bicep`: Primary infrastructure template
-- `README.md`: Detailed documentation
+### ファイル構造
+- `main.bicep`: プライマリインフラストラクチャテンプレート
 
-### Naming Conventions
-- Resources use consistent naming with environment prefix
-- Unique suffixes prevent naming conflicts
-- Clear resource type identification
+### 命名規則
+- リソースは環境プレフィックスで一貫した命名を使用
+- 一意の接尾辞により命名競合を防止
+- 明確なリソースタイプ識別
 
-### Parameter Design
-- Required parameters for essential configuration
-- Sensible defaults for optional parameters
-- Validation where appropriate
-- Clear descriptions and examples
+### セキュリティ要件
+- サービス認証にManaged Identity
+- 機密サービス用のプライベートエンドポイント
+- ネットワークセグメンテーションと分離
+- Key Vaultを通じたシークレット管理
+- 該当する場所でのHTTPS強制
 
-### Security Requirements
-- Managed Identity for service authentication
-- Private endpoints for sensitive services
-- Network segmentation and isolation
-- Secrets management through Key Vault
-- HTTPS enforcement where applicable
+## カスタマイズガイド
 
-## Customization Guide
+### 新しい環境定義の追加
 
-### Adding New Environment Definitions
+1. `environment-definitions/` 下に新しいディレクトリを作成
+2. 必要なファイルを追加: `main.bicep`
+3. 命名とセキュリティ標準に従う
+4. 開発環境でデプロイメントをテスト
+5. カタログドキュメントを更新
 
-1. Create a new directory under `environment-definitions/`
-2. Add required files: `manifest.yaml`, `main.bicep`, `README.md`
-3. Follow naming and security standards
-4. Test deployment in development environment
-5. Update catalog documentation
+### 既存テンプレートの変更
 
-### Modifying Existing Templates
+1. 必要な変更でBicepテンプレートを更新
+2. ドキュメントを更新
+3. 変更を徹底的にテスト
+4. 適切にバージョン管理
 
-1. Update the Bicep template with required changes
-2. Modify manifest.yaml if parameters change
-3. Update README.md documentation
-4. Test changes thoroughly
-5. Version appropriately
+## ベストプラクティス
 
-### Parameter Guidelines
+### 開発
+- すべてのリソースにinfrastructure as codeを使用
+- 適切なエラーハンドリングを実装
+- Azure命名規則に従う
+- 一貫したタグ戦略を使用
 
-- Use descriptive names and clear descriptions
-- Provide sensible defaults where possible
-- Use validation rules for user input
-- Group related parameters logically
-- Document parameter relationships
+### セキュリティ
+- 利用可能なすべてのセキュリティ機能を有効化
+- 最小権限アクセス原則を使用
+- 定期的なセキュリティレビューと更新
+- セキュリティ脆弱性の監視
 
-## Best Practices
+### 運用
+- 包括的な監視を実装
+- 重要な問題のアラートを設定
+- バックアップと災害復旧を計画
+- 定期的なメンテナンスと更新
 
-### Development
-- Use infrastructure as code for all resources
-- Implement proper error handling
-- Follow Azure naming conventions
-- Use consistent tagging strategies
+### コスト管理
+- ワークロード要件に応じたリソースSKUの最適化
+- 適切な場所での自動スケーリングの実装
+- コストしきい値の監視とアラート
+- 定期的なコスト最適化レビュー
 
-### Security
-- Enable all available security features
-- Use least privilege access principles
-- Regular security reviews and updates
-- Monitor for security vulnerabilities
+## リソース
 
-### Operations
-- Implement comprehensive monitoring
-- Set up alerting for critical issues
-- Plan for backup and disaster recovery
-- Regular maintenance and updates
+- [Azure Deployment Environments ドキュメント](https://learn.microsoft.com/ja-jp/azure/deployment-environments/)
+- [Azure Bicep ドキュメント](https://learn.microsoft.com/ja-jp/azure/azure-resource-manager/bicep/)
+- [Azureセキュリティのベストプラクティス](https://learn.microsoft.com/ja-jp/azure/security/)
+- [Azure Well-Architected Framework](https://learn.microsoft.com/ja-jp/azure/well-architected/)
 
-### Cost Management
-- Optimize resource SKUs for workload requirements
-- Implement auto-scaling where appropriate
-- Monitor and alert on cost thresholds
-- Regular cost optimization reviews
+## バージョン履歴
 
-## Support and Contribution
-
-### Documentation
-- Each environment definition includes comprehensive documentation
-- Setup guides for complete workflow
-- Troubleshooting guides for common issues
-- Best practices and recommendations
-
-### Quality Assurance
-- All templates tested before publication
-- Regular updates for Azure service changes
-- Security reviews and updates
-- Performance optimization
-
-### Feedback
-- Environment feedback through Azure DevOps or GitHub issues
-- Feature requests and improvement suggestions
-- Bug reports and fixes
-- Community contributions welcome
-
-## Compliance and Governance
-
-### Security Compliance
-- Follows Azure security best practices
-- Implements defense in depth
-- Regular security assessments
-- Compliance with industry standards
-
-### Operational Excellence
-- Monitoring and alerting standards
-- Backup and recovery procedures
-- Change management processes
-- Documentation standards
-
-### Cost Governance
-- Resource optimization guidelines
-- Cost monitoring and alerting
-- Budget management
-- Resource lifecycle management
-
-## Resources
-
-- [Azure Deployment Environments Documentation](https://learn.microsoft.com/en-us/azure/deployment-environments/)
-- [Azure Bicep Documentation](https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/)
-- [Azure Security Best Practices](https://learn.microsoft.com/en-us/azure/security/)
-- [Azure Well-Architected Framework](https://learn.microsoft.com/en-us/azure/well-architected/)
-
-## Version History
-
-- **v1.0.0**: Initial release with secure web application environment
-  - Complete infrastructure template
-  - Security best practices implementation
-  - Comprehensive documentation
-  - Setup and deployment guides
+- **v1.0.0**: セキュアWebアプリケーション環境の初回リリース
+  - 完全なインフラストラクチャテンプレート
+  - セキュリティベストプラクティスの実装
+  - 包括的なドキュメント
+  - セットアップとデプロイメントガイド

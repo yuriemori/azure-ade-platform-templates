@@ -1,66 +1,66 @@
-# Azure Deployment Environments Setup Guide
+# Azure Deployment Environments セットアップガイド
 
-This guide walks through the complete setup process for deploying the Secure Web Application Environment using Azure Deployment Environments (ADE).
+このガイドでは、Azure Deployment Environments (ADE) を使用してセキュアWebアプリケーション環境をデプロイするための完全なセットアップ手順を説明します。
 
-## Overview
+## 概要
 
-Azure Deployment Environments enables self-service deployment of application infrastructure by development teams. This setup creates a catalog containing our secure web application environment template.
+Azure Deployment Environmentsは、開発チームがアプリケーションインフラストラクチャのセルフサービスデプロイメントを可能にします。このセットアップでは、セキュアWebアプリケーション環境テンプレートを含むカタログを作成します。
 
-## Prerequisites
+## 前提条件
 
-- Azure subscription with Owner or Contributor permissions
-- Azure CLI or Azure PowerShell installed
-- Git repository containing this catalog (this repo)
+- OwnerまたはContributor権限を持つAzureサブスクリプション
+- Azure CLIまたはAzure PowerShellがインストール済み
+- このカタログを含むGitリポジトリ（このリポジトリ）
 
-## Step 1: Create Dev Center
+## ステップ1: Dev Centerの作成
 
-### Using Azure Portal
+### Azureポータルを使用
 
-1. Navigate to the Azure Portal
-2. Search for "Dev centers" and create a new Dev Center
-3. Fill in the required information:
-   - **Name**: `webapp-devcenter` (or your preferred name)
-   - **Subscription**: Your target subscription
-   - **Resource Group**: Create new or select existing
-   - **Location**: Japan East (or your preferred region)
-4. Click "Review + Create" then "Create"
+1. Azureポータルに移動
+2. "Dev centers" を検索して新しいDev Centerを作成
+3. 必要な情報を入力：
+   - **名前**: `webapp-devcenter`（または任意の名前）
+   - **サブスクリプション**: 対象のサブスクリプション
+   - **リソースグループ**: 新規作成または既存を選択
+   - **場所**: Japan East（または任意のリージョン）
+4. "Review + Create" をクリックし、次に "Create" をクリック
 
-### Using Azure CLI
+### Azure CLIを使用
 
 ```bash
-# Set variables
+# 変数を設定
 SUBSCRIPTION_ID="your-subscription-id"
 RESOURCE_GROUP="rg-webapp-devcenter"
 DEVCENTER_NAME="webapp-devcenter"
 LOCATION="japaneast"
 
-# Create resource group
+# リソースグループを作成
 az group create --name $RESOURCE_GROUP --location $LOCATION
 
-# Create Dev Center
+# Dev Centerを作成
 az devcenter admin devcenter create \
   --resource-group $RESOURCE_GROUP \
   --name $DEVCENTER_NAME \
   --location $LOCATION
 ```
 
-## Step 2: Create Catalog
+## ステップ2: カタログの作成
 
-### Using Azure Portal
+### Azureポータルを使用
 
-1. In your Dev Center, navigate to "Catalogs"
-2. Click "Add" to create a new catalog
-3. Configure the catalog:
-   - **Name**: `secure-webapp-catalog`
+1. Dev Centerで「カタログ」に移動
+2. 「追加」をクリックして新しいカタログを作成
+3. カタログを設定：
+   - **名前**: `secure-webapp-catalog`
    - **Git Clone URI**: `https://github.com/yuriemori/mcp_trial.git`
-   - **Branch**: `main`
-   - **Path**: `/ade-catalog`
-4. Click "Add"
+   - **ブランチ**: `main`
+   - **パス**: `/ade-catalog`
+4. 「追加」をクリック
 
-### Using Azure CLI
+### Azure CLIを使用
 
 ```bash
-# Create catalog
+# カタログを作成
 az devcenter admin catalog create \
   --resource-group $RESOURCE_GROUP \
   --dev-center $DEVCENTER_NAME \
@@ -70,51 +70,51 @@ az devcenter admin catalog create \
   --git-hub-path "/ade-catalog"
 ```
 
-## Step 3: Create Project
+## ステップ3: プロジェクトの作成
 
-### Using Azure Portal
+### Azureポータルを使用
 
-1. In your Dev Center, navigate to "Projects"
-2. Click "Create" to create a new project
-3. Configure the project:
-   - **Name**: `webapp-project`
-   - **Description**: `Web Application Development Project`
-   - **Resource Group**: Select or create a resource group for deployed environments
-4. Click "Create"
+1. Dev Centerで「プロジェクト」に移動
+2. 「作成」をクリックして新しいプロジェクトを作成
+3. プロジェクトを設定：
+   - **名前**: `webapp-project`
+   - **説明**: `Webアプリケーション開発プロジェクト`
+   - **リソースグループ**: デプロイされた環境用のリソースグループを選択または作成
+4. 「作成」をクリック
 
-### Using Azure CLI
+### Azure CLIを使用
 
 ```bash
 PROJECT_NAME="webapp-project"
 PROJECT_RG="rg-webapp-environments"
 
-# Create resource group for environments
+# 環境用のリソースグループを作成
 az group create --name $PROJECT_RG --location $LOCATION
 
-# Create project
+# プロジェクトを作成
 az devcenter admin project create \
   --resource-group $RESOURCE_GROUP \
   --name $PROJECT_NAME \
   --dev-center-id "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP/providers/Microsoft.DevCenter/devcenters/$DEVCENTER_NAME" \
-  --description "Web Application Development Project"
+  --description "Webアプリケーション開発プロジェクト"
 ```
 
-## Step 4: Create Environment Type
+## ステップ4: 環境タイプの作成
 
-### Using Azure Portal
+### Azureポータルを使用
 
-1. In your Dev Center, navigate to "Environment types"
-2. Click "Add" to create a new environment type
-3. Configure the environment type:
-   - **Name**: `development`
-   - **Description**: `Development environment for web applications`
-4. Click "Add"
-5. Repeat for additional environment types (`staging`, `production`)
+1. Dev Centerで「環境タイプ」に移動
+2. 「追加」をクリックして新しい環境タイプを作成
+3. 環境タイプを設定：
+   - **名前**: `development`
+   - **説明**: `Webアプリケーション用開発環境`
+4. 「追加」をクリック
+5. 追加の環境タイプ（`staging`、`production`）についても繰り返し
 
-### Using Azure CLI
+### Azure CLIを使用
 
 ```bash
-# Create environment types
+# 環境タイプを作成
 az devcenter admin environment-type create \
   --resource-group $RESOURCE_GROUP \
   --dev-center $DEVCENTER_NAME \
@@ -131,23 +131,23 @@ az devcenter admin environment-type create \
   --name "production"
 ```
 
-## Step 5: Configure Project Environment Types
+## ステップ5: プロジェクト環境タイプの設定
 
-### Using Azure Portal
+### Azureポータルを使用
 
-1. Navigate to your Project
-2. Go to "Environment types"
-3. Click "Add" and select the environment types created above
-4. For each environment type, configure:
-   - **Deployment subscription**: Target subscription for environments
-   - **Deployment resource group**: Resource group for deployed resources
-   - **Creator role assignments**: Roles for environment creators
-   - **User role assignments**: Roles for environment users
+1. プロジェクトに移動
+2. 「環境タイプ」に移動
+3. 「追加」をクリックして上記で作成した環境タイプを選択
+4. 各環境タイプについて以下を設定：
+   - **デプロイメントサブスクリプション**: 環境用の対象サブスクリプション
+   - **デプロイメントリソースグループ**: デプロイされたリソース用のリソースグループ
+   - **作成者ロール割り当て**: 環境作成者のロール
+   - **ユーザーロール割り当て**: 環境ユーザーのロール
 
-### Using Azure CLI
+### Azure CLIを使用
 
 ```bash
-# Configure project environment type
+# プロジェクト環境タイプを設定
 az devcenter admin project-environment-type create \
   --resource-group $RESOURCE_GROUP \
   --project-name $PROJECT_NAME \
@@ -156,25 +156,25 @@ az devcenter admin project-environment-type create \
   --status "Enabled"
 ```
 
-## Step 6: Assign User Permissions
+## ステップ6: ユーザー権限の割り当て
 
-### Required Roles
+### 必要なロール
 
-- **Dev Center Project Admin**: Can manage projects and environment types
-- **Deployment Environments User**: Can create and manage environments
-- **DevCenter Dev Box User**: Can access the developer portal
+- **Dev Center Project Admin**: プロジェクトと環境タイプを管理可能
+- **Deployment Environments User**: 環境の作成と管理が可能
+- **DevCenter Dev Box User**: 開発者ポータルにアクセス可能
 
-### Using Azure Portal
+### Azureポータルを使用
 
-1. Navigate to your Project
-2. Go to "Access control (IAM)"
-3. Click "Add role assignment"
-4. Assign appropriate roles to users or groups
+1. プロジェクトに移動
+2. 「アクセス制御（IAM）」に移動
+3. 「ロール割り当ての追加」をクリック
+4. ユーザーまたはグループに適切なロールを割り当て
 
-### Using Azure CLI
+### Azure CLIを使用
 
 ```bash
-# Assign user to project
+# ユーザーをプロジェクトに割り当て
 USER_PRINCIPAL_ID="user-object-id"
 
 az role assignment create \
@@ -183,25 +183,25 @@ az role assignment create \
   --scope "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP/providers/Microsoft.DevCenter/projects/$PROJECT_NAME"
 ```
 
-## Step 7: Deploy Environment (Developer Workflow)
+## ステップ7: 環境のデプロイ（開発者ワークフロー）
 
-### Using Developer Portal
+### Developer Portalを使用
 
-1. Navigate to https://devportal.microsoft.com
-2. Select your project
-3. Click "New environment"
-4. Choose "secure-webapp" environment definition
-5. Fill in parameters:
-   - **Environment Name**: `my-webapp-dev`
-   - **Location**: `japaneast`
-   - **App Service Plan SKU**: `B1` (for development)
-   - **SQL Database SKU**: `Basic` (for development)
-6. Click "Create"
+1. https://devportal.microsoft.com に移動
+2. プロジェクトを選択
+3. 「新しい環境」をクリック
+4. "secure-webapp" 環境定義を選択
+5. パラメータを入力：
+   - **環境名**: `my-webapp-dev`
+   - **場所**: `japaneast`
+   - **App Service Plan SKU**: `B1`（開発用）
+   - **SQL Database SKU**: `Basic`（開発用）
+6. 「作成」をクリック
 
-### Using Azure CLI
+### Azure CLIを使用
 
 ```bash
-# Create environment
+# 環境を作成
 az devcenter dev environment create \
   --dev-center $DEVCENTER_NAME \
   --project-name $PROJECT_NAME \
@@ -218,61 +218,61 @@ az devcenter dev environment create \
   }'
 ```
 
-## Step 8: Verify Deployment
+## ステップ8: デプロイメントの検証
 
-After deployment, verify the following resources are created:
+デプロイメント後、以下のリソースが作成されていることを確認：
 
-1. **Resource Group**: Named with environment prefix
-2. **App Services**: Frontend and backend applications
-3. **SQL Database**: With private endpoint
-4. **Key Vault**: With secrets and proper access policies
-5. **Virtual Network**: With proper subnet configuration
-6. **Application Gateway**: If enabled
+1. **リソースグループ**: 環境プレフィックス付きの名前
+2. **App Services**: フロントエンドとバックエンドアプリケーション
+3. **SQL Database**: プライベートエンドポイント付き
+4. **Key Vault**: シークレットと適切なアクセスポリシー付き
+5. **Virtual Network**: 適切なサブネット設定
+6. **Application Gateway**: 有効にした場合
 
-## Troubleshooting
+## トラブルシューティング
 
-### Common Issues
+### よくある問題
 
-1. **Catalog Sync Failure**
-   - Verify repository URL and branch
-   - Check path to catalog directory
-   - Ensure manifest.yaml is valid
+1. **カタログ同期の失敗**
+   - リポジトリのURLとブランチを確認
+   - カタログディレクトリへのパスを確認
+   - manifest.yamlが有効であることを確認
 
-2. **Permission Errors**
-   - Verify user has appropriate roles
-   - Check subscription permissions
-   - Validate resource group access
+2. **権限エラー**
+   - ユーザーが適切なロールを持っていることを確認
+   - サブスクリプション権限を確認
+   - リソースグループアクセスを検証
 
-3. **Deployment Failures**
-   - Review deployment logs in the portal
-   - Check parameter values
-   - Verify quota limits
+3. **デプロイメントの失敗**
+   - ポータルでデプロイメントログを確認
+   - パラメータ値を確認
+   - クォータ制限を確認
 
-### Logs and Monitoring
+### ログと監視
 
-- **Activity Log**: View deployment activities
-- **Deployment History**: Check detailed deployment logs
-- **Resource Health**: Monitor resource status
+- **アクティビティログ**: デプロイメントアクティビティを表示
+- **デプロイメント履歴**: 詳細なデプロイメントログを確認
+- **リソースヘルス**: リソースステータスを監視
 
-## Best Practices
+## ベストプラクティス
 
-1. **Environment Naming**: Use consistent naming conventions
-2. **Resource Tagging**: Apply tags for cost tracking and governance
-3. **Security**: Regularly review access permissions
-4. **Cost Management**: Monitor environment costs and set budgets
-5. **Lifecycle**: Implement environment cleanup policies
+1. **環境命名**: 一貫した命名規則を使用
+2. **リソースタグ**: コスト追跡とガバナンスのためのタグを適用
+3. **セキュリティ**: アクセス権限を定期的にレビュー
+4. **コスト管理**: 環境コストを監視し、予算を設定
+5. **ライフサイクル**: 環境クリーンアップポリシーを実装
 
-## Next Steps
+## 次のステップ
 
-1. Customize the environment template for your specific needs
-2. Add additional environment definitions for different application types
-3. Implement CI/CD integration with GitHub Actions
-4. Set up monitoring and alerting for deployed environments
-5. Create environment management policies and governance
+1. 特定のニーズに合わせて環境テンプレートをカスタマイズ
+2. 異なるアプリケーションタイプ用の追加環境定義を追加
+3. GitHub ActionsでCI/CD統合を実装
+4. デプロイされた環境の監視とアラートを設定
+5. 環境管理ポリシーとガバナンスを作成
 
-## Resources
+## リソース
 
-- [Azure Deployment Environments Documentation](https://learn.microsoft.com/en-us/azure/deployment-environments/)
-- [Bicep Language Reference](https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/)
-- [Azure CLI Reference](https://learn.microsoft.com/en-us/cli/azure/)
-- [Best Practices for ADE Catalogs](https://learn.microsoft.com/en-us/azure/deployment-environments/best-practice-catalog-structure)
+- [Azure Deployment Environments ドキュメント](https://learn.microsoft.com/ja-jp/azure/deployment-environments/)
+- [Bicep言語リファレンス](https://learn.microsoft.com/ja-jp/azure/azure-resource-manager/bicep/)
+- [Azure CLI リファレンス](https://learn.microsoft.com/ja-jp/cli/azure/)
+- [ADEカタログのベストプラクティス](https://learn.microsoft.com/ja-jp/azure/deployment-environments/)
