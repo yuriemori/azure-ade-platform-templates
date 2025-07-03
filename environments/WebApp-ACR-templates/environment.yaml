@@ -1,11 +1,13 @@
+# yaml-language-server: $schema=https://github.com/Azure/deployment-environments/releases/download/2022-11-11-preview/manifest.schema.json
 name: WebApp-with-ACR-Environment
 version: 1.0.0
-summary: WebアプリケーションとACRを統合した環境
-description: この環境は、Azure App Service、Azure Container Registry (ACR)、Azure SQL Database、Key Vaultなどを含むWebアプリケーションのデプロイメントをサポートします。セキュリティとスケーラビリティを考慮した設計です。
+summary: Web application environment with ACR integration
+description: This environment supports deployment of a web application including Azure App Service, Azure Container Registry (ACR), Azure SQL Database, and Key Vault. Designed for security and scalability.
 runner: bicep
 templatePath: ./main.bicep
 parameters:
-  envName:
+  - id: envName
+    name: Environment Name
+    description: Name prefix for resources in this environment
     type: string
-    description: 環境名（リソース名のプレフィックス等に利用）
     required: true
