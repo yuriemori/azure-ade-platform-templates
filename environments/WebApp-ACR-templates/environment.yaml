@@ -1,7 +1,4 @@
-# yaml-language-server: $schema=https://github.com/Azure/deployment-environments/releases/download/2022-11-11-preview/manifest.schema.json
-# Azure Deployment Environments カタログ用 environment.yaml
-
-name: WebApp-with-ACR Environment
+name: WebApp-with-ACR-Environment
 version: 1.0.0
 summary: WebアプリケーションとACRを統合した環境
 description: この環境は、Azure App Service、Azure Container Registry (ACR)、Azure SQL Database、Key Vaultなどを含むWebアプリケーションのデプロイメントをサポートします。セキュリティとスケーラビリティを考慮した設計です。
@@ -12,5 +9,3 @@ parameters:
     type: string
     description: 環境名（リソース名のプレフィックス等に利用）
     required: true
-
-# 必要に応じて追加パラメータを記載
