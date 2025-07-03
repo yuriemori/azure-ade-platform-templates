@@ -45,12 +45,64 @@ resource feApp 'Microsoft.Web/sites@2022-03-01' = {
   }
 }
 
+// フロントエンド用デプロイスロット（例: staging）
+resource feAppStagingSlot 'Microsoft.Web/sites/slots@2022-03-01' = {
+  name: '${feApp.name}/staging'
+  location: location
+  properties: {
+    serverFarmId: plan.id
+    siteConfig: {
+      appSettings: [
+        {
+          name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
+          value: appInsightsInstrumentationKey
+        }
+        {
+          name: 'KEYVAULT_URI'
+          value: keyVaultId
+        }
+        {
+          name: 'SQL_SERVER_NAME'
+          value: sqlServerName
+        }
+      ]
+      vnetRouteAllEnabled: true
+    }
+  }
+}
+
 resource beApp 'Microsoft.Web/sites@2022-03-01' = {
   name: '${envName}-be'
   location: location
   identity: {
     type: 'SystemAssigned'
   }
+  properties: {
+    serverFarmId: plan.id
+    siteConfig: {
+      appSettings: [
+        {
+          name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
+          value: appInsightsInstrumentationKey
+        }
+        {
+          name: 'KEYVAULT_URI'
+          value: keyVaultId
+        }
+        {
+          name: 'SQL_SERVER_NAME'
+          value: sqlServerName
+        }
+      ]
+      vnetRouteAllEnabled: true
+    }
+  }
+}
+
+// バックエンド用デプロイスロット（例: staging）
+resource beAppStagingSlot 'Microsoft.Web/sites/slots@2022-03-01' = {
+  name: '${beApp.name}/staging'
+  location: location
   properties: {
     serverFarmId: plan.id
     siteConfig: {
