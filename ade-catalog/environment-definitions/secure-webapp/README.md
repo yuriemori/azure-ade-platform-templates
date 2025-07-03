@@ -1,112 +1,112 @@
-# Secure Web Application Environment
+# セキュアWebアプリケーション環境
 
-This Azure Deployment Environments definition creates a complete, secure, and scalable web application infrastructure following Azure best practices.
+このAzure Deployment Environments定義は、Azureベストプラクティスに従った完全で安全かつスケーラブルなWebアプリケーションインフラストラクチャを作成します。
 
-## Architecture
+## アーキテクチャ
 
-The template deploys the following components:
+このテンプレートは以下のコンポーネントをデプロイします：
 
-### Core Infrastructure
-- **Virtual Network**: Segmented subnets for App Services, Application Gateway, and Private Endpoints
-- **App Service Plan**: Linux-based plan supporting containerized applications
-- **Frontend App Service**: Container-based frontend application
-- **Backend App Service**: Container-based backend API
-- **Azure SQL Database**: Managed database with private endpoint connectivity
-- **Azure Key Vault**: Centralized secrets management with RBAC
-- **Application Insights**: Application performance monitoring
-- **Log Analytics Workspace**: Centralized logging and monitoring
+### コアインフラストラクチャ
+- **仮想ネットワーク**: App Services、Application Gateway、プライベートエンドポイント用のセグメント化されたサブネット
+- **App Service プラン**: コンテナ化されたアプリケーションをサポートするLinuxベースのプラン
+- **フロントエンド App Service**: コンテナベースのフロントエンドアプリケーション
+- **バックエンド App Service**: コンテナベースのバックエンドAPI
+- **Azure SQL Database**: プライベートエンドポイント接続を持つマネージドデータベース
+- **Azure Key Vault**: RBACを使用した集中的なシークレット管理
+- **Application Insights**: アプリケーションパフォーマンス監視
+- **Log Analytics ワークスペース**: 集中ログ記録と監視
 
-### Security Features
-- **Managed Identity**: Passwordless authentication for all services
-- **Private Endpoints**: Private connectivity for SQL Database and Key Vault
-- **VNet Integration**: App Services integrated with virtual network
-- **Application Gateway**: Web Application Firewall (WAF) protection
-- **RBAC**: Role-based access control for Key Vault access
-- **HTTPS Only**: All web traffic enforced over HTTPS
+### セキュリティ機能
+- **マネージドID**: すべてのサービスでパスワードレス認証
+- **プライベートエンドポイント**: SQL DatabaseとKey Vaultへのプライベート接続
+- **VNet統合**: 仮想ネットワークと統合されたApp Services
+- **Application Gateway**: Web Application Firewall (WAF) 保護
+- **RBAC**: Key Vaultアクセス用のロールベースアクセス制御
+- **HTTPS のみ**: すべてのWebトラフィックでHTTPS強制
 
-### Network Security
-- Dedicated subnets for different service tiers
-- Private DNS zones for private endpoint resolution
-- Network security groups (implied through subnet delegation)
-- Public access disabled for SQL Database and Key Vault
+### ネットワークセキュリティ
+- 異なるサービス層用の専用サブネット
+- プライベートエンドポイント解決用のプライベートDNSゾーン
+- ネットワークセキュリティグループ（サブネット委任によって暗示）
+- SQL DatabaseとKey Vaultでパブリックアクセス無効化
 
-## Parameters
+## パラメータ
 
-| Parameter | Description | Default | Required |
-|-----------|-------------|---------|----------|
-| `environmentName` | Name prefix for all resources | - | Yes |
-| `location` | Azure region for deployment | japaneast | Yes |
-| `appServicePlanSku` | App Service Plan pricing tier | P1v3 | No |
-| `sqlDatabaseSku` | SQL Database pricing tier | S1 | No |
-| `enableApplicationGateway` | Deploy Application Gateway with WAF | true | No |
-| `containerImageTag` | Container image tag for applications | latest | No |
+| パラメータ | 説明 | デフォルト | 必須 |
+|-----------|------|----------|------|
+| `environmentName` | すべてのリソースの名前プレフィックス | - | はい |
+| `location` | デプロイメント用のAzureリージョン | japaneast | はい |
+| `appServicePlanSku` | App Service Planの価格ティア | P1v3 | いいえ |
+| `sqlDatabaseSku` | SQL Databaseの価格ティア | S1 | いいえ |
+| `enableApplicationGateway` | WAF付きApplication Gatewayをデプロイ | true | いいえ |
+| `containerImageTag` | アプリケーション用のコンテナイメージタグ | latest | いいえ |
 
-## Deployment
+## デプロイメント
 
-This environment is designed to be deployed through Azure Deployment Environments (ADE). The following steps are required:
+この環境はAzure Deployment Environments (ADE)を通じてデプロイされるように設計されています。以下の手順が必要です：
 
-1. Register this catalog in your Dev Center
-2. Create an environment definition pointing to this template
-3. Deploy through the Developer Portal or Azure CLI
+1. Dev Centerでこのカタログを登録
+2. このテンプレートを指すエンバイロメント定義を作成
+3. Developer PortalまたはAzure CLIを通じてデプロイ
 
-### Prerequisites
+### 前提条件
 
-- Azure subscription with appropriate permissions
-- Dev Center configured with this catalog
-- Container images available in a container registry (for actual applications)
+- 適切な権限を持つAzureサブスクリプション
+- このカタログで構成されたDev Center
+- コンテナレジストリで利用可能なコンテナイメージ（実際のアプリケーション用）
 
-## Post-Deployment Configuration
+## デプロイ後の設定
 
-After deployment, the following manual steps may be required:
+デプロイ後、以下の手動手順が必要な場合があります：
 
-1. **Container Images**: Update App Services with actual container images
-2. **SSL Certificates**: Configure SSL certificates for Application Gateway
-3. **Database Schema**: Initialize database schema and data
-4. **Application Configuration**: Update application settings and connection strings
-5. **DNS Configuration**: Point custom domains to Application Gateway
+1. **コンテナイメージ**: 実際のコンテナイメージでApp Servicesを更新
+2. **SSL証明書**: Application Gateway用のSSL証明書を設定
+3. **データベーススキーマ**: データベーススキーマとデータを初期化
+4. **アプリケーション設定**: アプリケーション設定と接続文字列を更新
+5. **DNS設定**: カスタムドメインをApplication Gatewayに設定
 
-## Monitoring
+## 監視
 
-The environment includes comprehensive monitoring:
+環境には包括的な監視が含まれています：
 
-- **Application Insights**: Application performance and user analytics
-- **Log Analytics**: Centralized logging for all Azure resources
-- **Azure Monitor**: Infrastructure metrics and alerting
+- **Application Insights**: アプリケーションパフォーマンスとユーザー分析
+- **Log Analytics**: すべてのAzureリソースの集中ログ記録
+- **Azure Monitor**: インフラストラクチャメトリクスとアラート
 
-## Security Best Practices Implemented
+## 実装されたセキュリティベストプラクティス
 
-- Managed Identity for passwordless authentication
-- Private endpoints for database and key vault connectivity
-- VNet integration for App Services
-- Web Application Firewall for external traffic protection
-- RBAC for fine-grained access control
-- Secrets stored in Key Vault with proper access policies
-- HTTPS enforced for all web traffic
-- Public access disabled for sensitive resources
+- パスワードレス認証のためのマネージドID
+- データベースとkey vault接続のためのプライベートエンドポイント
+- App ServicesのVNet統合
+- 外部トラフィック保護のためのWeb Application Firewall
+- きめ細かいアクセス制御のためのRBAC
+- 適切なアクセスポリシーでKey Vaultに保存されたシークレット
+- すべてのWebトラフィックでHTTPS強制
+- 機密リソースでパブリックアクセス無効化
 
-## Scaling and High Availability
+## スケーリングと高可用性
 
-- App Service Plan supports auto-scaling
-- SQL Database with built-in high availability
-- Application Gateway provides load balancing
-- Multi-zone deployment capability (depending on region)
+- 自動スケーリングをサポートするApp Service Plan
+- 組み込み高可用性を持つSQL Database
+- ロードバランシングを提供するApplication Gateway
+- マルチゾーンデプロイメント機能（リージョンによる）
 
-## Cost Optimization
+## コスト最適化
 
-- Configurable SKUs for different environments (dev/test/prod)
-- Shared App Service Plan for frontend and backend
-- Efficient resource sizing based on workload requirements
+- 異なる環境（dev/test/prod）用の設定可能なSKU
+- フロントエンドとバックエンドで共有されるApp Service Plan
+- ワークロード要件に基づく効率的なリソースサイジング
 
-## Customization
+## カスタマイゼーション
 
-This template can be customized by:
+このテンプレートは以下によってカスタマイズできます：
 
-- Modifying SKUs for different performance requirements
-- Adding additional App Services for microservices architecture
-- Integrating with Azure Container Registry for CI/CD
-- Adding Azure CDN for global content delivery
-- Implementing Azure API Management for API governance
+- 異なるパフォーマンス要件に応じたSKUの変更
+- マイクロサービスアーキテクチャ用の追加App Servicesの追加
+- CI/CD用のAzure Container Registryとの統合
+- グローバルコンテンツ配信用のAzure CDNの追加
+- APIガバナンス用のAzure API Managementの実装
 
-## Support
+## サポート
 
-For issues and questions regarding this environment definition, please refer to the repository documentation or contact your platform team.
+この環境定義に関する問題や質問については、リポジトリドキュメントを参照するか、プラットフォームチームにお問い合わせください。
