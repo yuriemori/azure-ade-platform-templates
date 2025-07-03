@@ -1,7 +1,10 @@
 {
-    "servers": {
-        "microsoft.docs.mcp": {
-            "url": "https://learn.microsoft.com/api/mcp"
-        }
+  "servers": {
+    "ms-docs-mcp": {
+      "url": "https://learn.microsoft.com/api/mcp"
+    },
+    "my-githubmcp": {
+      "url": "https://api.githubcopilot.com/mcp/"
     }
+  }
 }
