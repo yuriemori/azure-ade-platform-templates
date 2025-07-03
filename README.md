@@ -17,6 +17,35 @@ These templates enable secure, scalable, and developer-friendly application envi
   - Application Insights
 - 📦 Ready to use in ADE Dev Portal with environment.yaml
 
+## 🧪 How to run what-if validation (step by step)
+
+1. **Install Azure CLI**  
+   [Install guide](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli)
+   ```bash
+   # Example for Ubuntu
+   curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+   ```
+
+2. **Login to Azure**
+   ```bash
+   az login
+   ```
+
+3. **Create a test resource group**
+   ```bash
+   az group create --name my-test-rg --location japaneast
+   ```
+
+4. **Run what-if validation**
+   ```bash
+   az deployment group what-if \
+     --resource-group my-test-rg \
+     --template-file environments/WebApp-ACR-templates/main.bicep \
+     --parameters envName=dev
+   ```
+
+---
+
 ## 📁 Template Structure
 
 ```bash
