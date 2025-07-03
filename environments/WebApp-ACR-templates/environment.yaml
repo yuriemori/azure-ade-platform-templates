@@ -11,3 +11,8 @@ parameters:
     description: Name prefix for resources in this environment
     type: string
     required: true
+  - id: sqlAdminPassword
+    name: SQL Admin Password
+    description: The administrator password for the Azure SQL Server (secureString)
+    type: secureString
+    required: true

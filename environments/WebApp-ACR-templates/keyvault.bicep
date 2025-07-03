@@ -1,10 +1,10 @@
 // keyvault.bicep: Azure Key Vault + Private Endpoint
 param envName string
 param vnetId string
-var location = 'japaneast'
+param location string
 
 resource keyVault 'Microsoft.KeyVault/vaults@2023-02-01' = {
-  name: '${envName}-kv'
+  name: 'yuriemori-${envName}-kv'
   location: location
   properties: {
     sku: {

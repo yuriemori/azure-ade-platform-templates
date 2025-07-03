@@ -1,6 +1,6 @@
 // appInsights.bicep: Application Insights
 param envName string
-var location = 'japaneast'
+param location string
 
 resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
   name: '${envName}-appi'

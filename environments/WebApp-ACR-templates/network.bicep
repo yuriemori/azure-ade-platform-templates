@@ -1,6 +1,6 @@
 // network.bicep: VNet, NSG, Private Endpoint, Application Gateway(WAF)
 param envName string
-var location = 'japaneast'
+param location string
 
 resource vnet 'Microsoft.Network/virtualNetworks@2022-05-01' = {
   name: '${envName}-vnet'
@@ -14,6 +14,11 @@ resource vnet 'Microsoft.Network/virtualNetworks@2022-05-01' = {
         name: 'default'
         properties: {
           addressPrefix: '10.0.1.0/24'
+          serviceEndpoints: [
+            {
+              service: 'Microsoft.KeyVault'
+            }
+          ]
         }
       }
     ]
@@ -21,3 +26,4 @@ resource vnet 'Microsoft.Network/virtualNetworks@2022-05-01' = {
 }
 
 output vnetId string = vnet.id
+output subnetId string = vnet.properties.subnets[0].id

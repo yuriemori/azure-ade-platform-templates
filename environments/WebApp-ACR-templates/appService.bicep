@@ -4,7 +4,7 @@ param keyVaultId string
 param sqlServerName string
 param appInsightsInstrumentationKey string
 param vnetId string
-var location = 'japaneast'
+param location string
 
 resource plan 'Microsoft.Web/serverfarms@2022-03-01' = {
   name: '${envName}-plan'
