@@ -13,6 +13,6 @@ parameters:
     required: true
   - id: sqlAdminPassword
     name: SQL Admin Password
-    description: The administrator password for the Azure SQL Server (secureString)
-    type: secureString
+    description: The administrator password for the Azure SQL Server. Enter a strong password; this value is handled as a plain string due to ADE schema limitations.
+    type: string
     required: true
