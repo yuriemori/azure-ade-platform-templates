@@ -4,16 +4,15 @@
 
 set -e
 
-SUBSCRIPTION_ID="${SUBSCRIPTION_ID:-$1}" # AzureサブスクリプションID: GitHubのvariableから取得
-TENANT_ID="${TENANT_ID:-$2}" # Azure ADテナントID: GitHubのvariableから取得
-GITHUB_ORG="${GITHUB_ORG:-${GITHUB_REPOSITORY_OWNER:-$3}}" #実行時に自動で設定される
-GITHUB_REPO="${GITHUB_REPO:-${GITHUB_REPOSITORY##*/}}" #実行時に自動で設定される
-SP_NAME="${SP_NAME:-$5}" # サービスプリンシパル名: GitHubのvariableから取得
+SUBSCRIPTION_ID="${SUBSCRIPTION_ID:-$1}" # AzureサブスクリプションID
+TENANT_ID="${TENANT_ID:-$2}" # Azure ADテナントID
+GITHUB_ORG="${GITHUB_ORG:-${GITHUB_REPOSITORY_OWNER:-$3}}" # GitHub組織/ユーザー名
+GITHUB_REPO="${GITHUB_REPO:-${GITHUB_REPOSITORY##*/}}" # GitHubリポジトリ名
+SP_NAME="${SP_NAME:-$5}" # サービスプリンシパル名
 
 if [ -z "$SUBSCRIPTION_ID" ] || [ -z "$TENANT_ID" ] || [ -z "$GITHUB_ORG" ] || [ -z "$GITHUB_REPO" ] || [ -z "$SP_NAME" ]; then
   echo "Usage: $0 <SUBSCRIPTION_ID> <TENANT_ID> <GITHUB_ORG> <GITHUB_REPO> <SP_NAME>"
-  echo "または、SUBSCRIPTION_ID, TENANT_ID, SP_NAME を環境変数で設定してください。"
-  echo "GITHUB_ORG, GITHUB_REPO はGitHub Actions実行時は自動で設定されます。"
+  echo "実行時の変数を指定して再度実行してください。"
   exit 1
 fi
 
@@ -35,12 +34,13 @@ az ad app federated-credential create \
     "name": "github-oidc",
     "issuer": "https://token.actions.githubusercontent.com",
     "subject": "repo:'"$GITHUB_ORG"'/'"$GITHUB_REPO"':ref:refs/heads/*",
-    "description": "GitHub Actions OIDC federated credential"
+    "description": "GitHub Actions OIDC federated credential",
+    "audiences": ["api://AzureADTokenExchange"]
   }'
 
 echo "---"
-echo "OIDC SP作成完了。GitHub Actionsのazure/login@v1で以下を使用してください:"
-echo "client-id: $APP_ID"
-echo "tenant-id: $TENANT_ID"
-echo "subscription-id: $SUBSCRIPTION_ID"
+echo "OIDC SP作成完了。GitHub secretに以下を設定してください:"
+echo "AZURE_CLIENT_ID: $APP_ID"
+echo "AZURE_TENANT_ID: $TENANT_ID"
+echo "AZURE_SUBSCRIPTION_ID: $SUBSCRIPTION_ID"
 echo "---"

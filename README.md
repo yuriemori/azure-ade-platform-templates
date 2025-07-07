@@ -1,63 +1,27 @@
-# azure-ade-platform-templates
+# Azure Deployment Environments Catalog Repository
 
-This repository provides reusable infrastructure templates designed for [Azure Deployment Environments (ADE)](https://learn.microsoft.com/en-us/azure/deployment-environments/overview).  
-These templates enable secure, scalable, and developer-friendly application environments that can be deployed via the Azure Dev Portal.
+This repository manages the catalog for Azure Deployment Environments (ADE).
 
-## ✅ Features
-
-- 🧱 Modular Bicep templates
-- 🔐 Secure-by-default configuration
-  - Managed Identity, Private Endpoints, Key Vault integration
-- 🖥️ Application stack:
-  - Azure App Service (Frontend & Backend, container-based)
-  - Azure SQL Database
-  - Azure Container Registry (ACR)
-  - Azure Key Vault
-  - Application Gateway with WAF
-  - Application Insights
-- 📦 Ready to use in ADE Dev Portal with environment.yaml
-
-## 🧪 How to run what-if validation (step by step)
-
-1. **Install Azure CLI**  
-   [Install guide](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli)
-   ```bash
-   # Example for Ubuntu
-   curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
-   ```
-
-2. **Login to Azure**
-   ```bash
-   az login
-   ```
-
-3. **Create a test resource group**
-   ```bash
-   az group create --name my-test-rg --location japaneast
-   ```
-
-4. **Run what-if validation**
-   ```bash
-   az deployment group what-if \
-     --resource-group my-test-rg \
-     --template-file environments/WebApp-ACR-templates/main.bicep \
-     --parameters envName=dev
-   ```
+- It provides infrastructure templates and configuration for deploying environments using ADE.
+- For detailed usage, setup, and deployment instructions for the WebApp-ACR-templates, see [README_ADE.md](./environments/WebApp-ACR-templates/README_ADE.md).
 
 ---
 
-## 📁 Template Structure
+## Prerequisites
+- Azure Deployment Environments (Dev Center/Project) must be already set up in your Azure subscription.
+- Finish these steps:
+  - [Quickstart: Configure Azure Deployment Environments](https://learn.microsoft.com/en-us/azure/deployment-environments/quickstart-create-and-configure-devcenter)
+  - [Quickstart: Create dev center and project for Azure Deployment Environments by using an ARM template](https://learn.microsoft.com/en-us/azure/deployment-environments/quickstart-create-dev-center-project-azure-resource-manager)
+  - [Quickstart: Create and access an environment in Azure Deployment Environments](https://learn.microsoft.com/en-us/azure/deployment-environments/quickstart-create-access-environments?tabs=no-existing-environments)
+- *This repository should be registered as a catalog in your Dev Center or Project.
 
-```bash
-/
-├── environment.yaml        # ADE catalog definition
-├── main.bicep             # Entry point Bicep template
-├── network.bicep
-├── keyvault.bicep
-├── sql.bicep
-├── appInsights.bicep
-├── appService.bicep
-├── gateway.bicep (optional)
-└── parameters/
-    ├── dev.bicepparam
-    └── prod.bicepparam
+---
+
+## Useful Microsoft Docs
+- [Azure Deployment Environments Overview](https://learn.microsoft.com/en-us/azure/deployment-environments/overview)
+- [How to set up Dev Center and Projects](https://learn.microsoft.com/en-us/azure/deployment-environments/quickstart-project-setup)
+- [Catalog Best Practices](https://learn.microsoft.com/en-us/azure/deployment-environments/best-practice-catalog-structure)
+
+---
+
+For all details about the WebApp-ACR-templates catalog and deployment, please see [README_ADE.md](./environments/WebApp-ACR-templates/README_ADE.md).

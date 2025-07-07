@@ -1,18 +1,27 @@
-# Azure Deployment Environments カタログ利用手順
+# Azure Deployment Environments Catalog: WebApp with ACR
 
-このドキュメントは、`WebApp-with-ACR Environment` カタログをAzure Deployment Environments (ADE) で利用し、Webアプリケーション環境をセルフサービスでデプロイするための手順をまとめたものです。
-
----
-
-## 1. 前提条件
-- Azureサブスクリプションとリソースグループが作成済み
-- Azure Deployment Environments (Dev Center/Project) が構成済み
-- カタログ（このリポジトリ）がDev CenterまたはProjectに登録済み
-- Azure CLI またはポータルへのアクセス権限
+This repository provides a reusable Azure Deployment Environments (ADE) catalog for deploying a secure and scalable web application environment. It uses modular Bicep templates and supports OIDC-based GitHub Actions CI/CD.
 
 ---
 
-## 2. カタログ構成
+## 1. Overview
+- Deploys: Azure App Service (frontend/backend), Azure SQL Database, Azure Key Vault, Azure Container Registry (ACR), Application Insights, VNet, and more
+- Security: Managed Identity, Private Endpoints, Key Vault integration
+- see [webapp-acr-architecture.md](/webapp-acr-architecture.md) for detailed architecture
+- Ready for: sync 'environment' folder path with Azure Deployment Environment (ADE) and bicep validation with GitHub Actions CI/CD
+
+---
+
+## 2. Prerequisites
+- Azure subscription
+- Azure CLI installed (`az login`)
+- Azure Deployment Environments (Dev Center/Project) set up
+- This catalog repository registered in your Dev Center or Project
+- Contributor or Owner permissions on your Azure subscription
+
+---
+
+## 3. Catalog Structure
 
 ```
 /environments/WebApp-ACR-templates/
@@ -23,51 +32,117 @@
   ├─ appInsights.bicep
   ├─ appService.bicep
   └─ environment.yaml
+/scripts/
+  └─ setup-oidc-github-sp.sh
 ```
 
-- `environment.yaml` : ADEカタログのmanifest（環境定義ファイル）
-- `main.bicep` : 全体のデプロイエントリーポイント
-- その他bicepファイル : 各リソースのモジュール
+- `environment.yaml`: ADE catalog manifest (environment definition)
+- `main.bicep`: Main entry point for deployment
+- Other Bicep files: Resource modules
+- `scripts/setup-oidc-github-sp.sh`: OIDC Service Principal setup script for GitHub Actions
 
 ---
 
-## 3. デプロイ手順
+## 4. How to Configure and Deploy (Step by Step)
 
-### 3.1. Azureポータルからの利用
-1. AzureポータルでDev Center > Project > Environmentsを開く
-2. 「新しい環境の作成」から `WebApp-with-ACR Environment` を選択
-3. `envName` など必要なパラメータを入力
-4. デプロイを実行
+## [For Plaform Engineer] How to Syc this Catalog to ADE
+1. Go to ADE > Developer center > Environment Configuration
+2. Click Add and set the path to this catalog repository (e.g. `environments/WebApp-ACR-templates`)
 
-### 3.2. Azure CLIからの利用
-```sh
-az devcenter dev environment create \
-  --dev-center <DevCenter名> \
-  --project <Project名> \
-  --catalog-name <カタログ名> \
-  --environment-type <EnvironmentType> \
-  --definition-name "WebApp-with-ACR Environment" \
-  --parameters envName=<任意の環境名>
-```
+## [For Developer] How to Create Environment (Step by Step)
+1. Go to [Developer portal](https://devportal.microsoft.com/)
+2. Click "Create new environment" and select `WebApp-with-ACR Environment`
+3. Enter required parameters (e.g. `envName`, `sqlAdminPassword`)
+4. Click Create
 
 ---
 
-## 4. パラメータ
-| パラメータ名 | 必須 | 説明 |
-|:------------|:-----|:------|
-| envName     | ○    | 環境名（リソース名のプレフィックス等に利用） |
+## 5. Parameters
+| Name             | Required | Description                                      |
+|------------------|----------|--------------------------------------------------|
+| envName          | Yes      | Name prefix for resources in this environment    |
+| sqlAdminPassword | Yes      | SQL Server admin password (plain string)         |
 
 ---
 
-## 5. 注意事項・ベストプラクティス
-- locationはJapan East（japaneast）で固定されています
-- デプロイ後、App Service/SQL/Key Vault/ACR等が一括で構成されます
-- セキュリティ・ネットワーク制御（VNet, Private Endpoint等）も自動適用
-- 必要に応じてbicepやmanifestのパラメータを拡張してください
+## 6. OIDC Service Principal Setup for GitHub Actions
+
+To enable OIDC authentication for GitHub Actions, follow these steps:
+
+### Prerequisites
+- Azure CLI installed and logged in (`az login`)
+- Contributor or Owner permissions on your Azure Subscription
+- The following variables ready:
+  - Azure Subscription ID
+  - Azure Tenant ID
+  - GitHub repository owner (username or org)
+  - GitHub repository name
+  - Service Principal name (e.g. `sp-ade-webapp-acr`)
+
+### Step-by-step Guide
+
+1. **Set environment variables**
+   ```bash
+   export SUBSCRIPTION_ID="<your-subscription-id>"
+   export TENANT_ID="<your-tenant-id>"
+   export GITHUB_ORG="<your-github-username-or-org>"
+   export GITHUB_REPO="<your-repo-name>"
+   export SP_NAME="sp-ade-webapp-acr"
+   ```
+2. **Run the setup script**
+   ```bash
+   bash scripts/setup-oidc-github-sp.sh
+   ```
+   Or, pass arguments directly:
+   ```bash
+   bash scripts/setup-oidc-github-sp.sh <SUBSCRIPTION_ID> <TENANT_ID> <GITHUB_ORG> <GITHUB_REPO> <SP_NAME>
+   ```
+3. **Register output values as GitHub Secrets**
+   - After the script runs, it will output:
+     - `AZURE_CLIENT_ID`
+     - `AZURE_TENANT_ID`
+     - `AZURE_SUBSCRIPTION_ID`
+   - Go to your GitHub repository > Settings > Secrets and variables > Actions, and add these as new secrets.
+4. **Use OIDC authentication in your GitHub Actions workflow**
+   ```yaml
+   - name: Azure Login (OIDC)
+     uses: azure/login@v1
+     with:
+       client-id: ${{ secrets.AZURE_CLIENT_ID }}
+       tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+       subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+       enable-AzPSSession: true
+   ```
 
 ---
 
-## 6. 参考リンク
-- [Azure Deployment Environments 公式ドキュメント](https://learn.microsoft.com/ja-jp/azure/deployment-environments/)
-- [カタログ設計ベストプラクティス](https://learn.microsoft.com/ja-jp/azure/deployment-environments/best-practice-catalog-structure)
-- [Bicep ベストプラクティス](https://learn.microsoft.com/ja-jp/azure/azure-resource-manager/bicep/best-practices)
+## 7. Best Practices & Notes
+- All resources are deployed to Japan East (`japaneast`). Change the location in `main.bicep` if needed.
+- App Service plan uses Standard (S1) SKU
+- No deployment slots are created by default
+- Key Vault name must be globally unique and 3-24 alphanumeric characters
+- SQL admin password is handled as a plain string due to ADE limitations
+- Review and adjust Bicep modules and parameters as needed for your use case
+
+---
+
+## 8. References
+- [Azure Deployment Environments Documentation](https://learn.microsoft.com/en-us/azure/deployment-environments/)
+- [Catalog Best Practices](https://learn.microsoft.com/en-us/azure/deployment-environments/best-practice-catalog-structure)
+- [Bicep Best Practices](https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/best-practices)
+
+---
+
+## 9. How Resource Validity is Ensured
+
+The validity of Azure resources created by `main.bicep` is automatically checked by the CI workflow (`webapp-acr-bicep-ci.yml`).
+- On every pull request, GitHub Actions runs:
+  - **Bicep lint**: Checks Bicep syntax and best practices
+  - **What-if deployment**: Simulates the deployment to verify resource creation and parameter validity without making changes
+- This ensures that any changes to the Bicep templates are validated before merging, reducing the risk of deployment errors.
+
+**Security Recommendation:**
+- It is strongly recommended to enable GitHub Advanced Security features for this repository:
+  - **Code scanning**: Detects vulnerabilities and security issues in your code and templates
+  - **Secret scanning**: Detects accidental exposure of secrets (passwords, keys, etc.) in your repository
+- These features help keep your infrastructure code secure and compliant.
