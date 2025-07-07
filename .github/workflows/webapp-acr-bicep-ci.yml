@@ -1,0 +1,46 @@
+name: WebApp-ACR-CI
+
+on:
+  pull_request:
+    paths:
+      - 'environments/WebApp-ACR-templates/**'
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Azure CLI
+        uses: azure/cli@v2
+      - name: Bicep Lint
+        run: |
+          az bicep build --file environments/WebApp-ACR-templates/main.bicep
+          az bicep lint --file environments/WebApp-ACR-templates/main.bicep
+
+  whatif:
+    runs-on: ubuntu-latest
+    needs: lint
+    env:
+      RG_NAME: ci-test-rg-${{ github.run_id }}-${{ github.run_number }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Azure CLI
+        uses: azure/cli@v2
+      - name: Azure Login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          enable-AzPSSession: true
+      - name: Create Resource Group
+        run: az group create --name $RG_NAME --location japaneast
+      - name: What-If
+        run: |
+          az deployment group what-if \
+            --resource-group $RG_NAME \
+            --template-file environments/WebApp-ACR-templates/main.bicep \
+            --parameters envName=testpr sqlAdminPassword='DummyPassword123!@#'
+      - name: Delete Resource Group
+        if: always()
+        run: az group delete --name $RG_NAME --yes --no-wait
