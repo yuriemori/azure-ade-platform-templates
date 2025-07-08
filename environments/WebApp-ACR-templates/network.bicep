@@ -244,7 +244,16 @@ resource appGateway 'Microsoft.Network/applicationGateways@2022-05-01' = {
     backendAddressPools: [
       {
         name: 'appServiceBackendPool'
-        properties: {}
+        properties: {
+          backendAddresses: [
+            {
+              fqdn: '${envName}-fe.azurewebsites.net'
+            }
+            {
+              fqdn: '${envName}-be.azurewebsites.net'
+            }
+          ]
+        }
       }
     ]
     backendHttpSettingsCollection: [

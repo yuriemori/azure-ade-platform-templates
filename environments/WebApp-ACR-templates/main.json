@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.36.1.42791",
-      "templateHash": "15401924006882747176"
+      "templateHash": "12974444622942001663"
     }
   },
   "parameters": {
@@ -44,7 +44,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.36.1.42791",
-              "templateHash": "5661462714787752442"
+              "templateHash": "6258521303015174528"
             }
           },
           "parameters": {
@@ -306,7 +306,16 @@
                 "backendAddressPools": [
                   {
                     "name": "appServiceBackendPool",
-                    "properties": {}
+                    "properties": {
+                      "backendAddresses": [
+                        {
+                          "fqdn": "[format('{0}-fe.azurewebsites.net', parameters('envName'))]"
+                        },
+                        {
+                          "fqdn": "[format('{0}-be.azurewebsites.net', parameters('envName'))]"
+                        }
+                      ]
+                    }
                   }
                 ],
                 "backendHttpSettingsCollection": [
@@ -733,7 +742,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.36.1.42791",
-              "templateHash": "16623362020724851192"
+              "templateHash": "11403950924385037804"
             }
           },
           "parameters": {
@@ -956,7 +965,25 @@
                 "[resourceId('Microsoft.Web/serverfarms', format('{0}-plan', parameters('envName')))]"
               ]
             }
-          ]
+          ],
+          "outputs": {
+            "frontendAppFqdn": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.Web/sites', format('{0}-fe', parameters('envName'))), '2022-03-01').defaultHostName]"
+            },
+            "backendAppFqdn": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.Web/sites', format('{0}-be', parameters('envName'))), '2022-03-01').defaultHostName]"
+            },
+            "frontendAppName": {
+              "type": "string",
+              "value": "[format('{0}-fe', parameters('envName'))]"
+            },
+            "backendAppName": {
+              "type": "string",
+              "value": "[format('{0}-be', parameters('envName'))]"
+            }
+          }
         }
       },
       "dependsOn": [

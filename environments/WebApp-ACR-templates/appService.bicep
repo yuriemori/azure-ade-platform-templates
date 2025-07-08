@@ -183,3 +183,8 @@ resource beAppStagingSlot 'Microsoft.Web/sites/slots@2022-03-01' = {
     }
   }
 }
+
+output frontendAppFqdn string = feApp.properties.defaultHostName
+output backendAppFqdn string = beApp.properties.defaultHostName
+output frontendAppName string = feApp.name
+output backendAppName string = beApp.name
