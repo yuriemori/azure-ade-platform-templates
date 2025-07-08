@@ -10,8 +10,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Set up Azure CLI
-        uses: azure/cli@v2
       - name: Bicep Lint
         run: |
           az bicep build --file environments/WebApp-ACR-templates/main.bicep
