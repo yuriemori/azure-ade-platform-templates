@@ -1,0 +1,39 @@
+# Build artifacts
+*.json
+!environment.json
+
+# Temporary files
+*.tmp
+*.log
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+
+# Security scan reports
+reports/
+*.sarif
+
+# Azure CLI cache
+.azure/
+
+# PowerShell modules
+PowerShell/
+PSRule/
+
+# Node modules (if any)
+node_modules/
+npm-debug.log
+
+# Python (if any)
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Test artifacts
+test-results/
+coverage/
