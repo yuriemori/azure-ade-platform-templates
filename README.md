@@ -24,4 +24,16 @@ This repository manages the catalog for Azure Deployment Environments (ADE).
 
 ---
 
+## DevSecOps and Security
+
+This repository implements DevSecOps best practices for Infrastructure as Code (IaC):
+
+- **[IaC DevSecOps Architecture](./iac-devsecops-architecture.md)** - Comprehensive DevSecOps implementation guide
+- **[Security Checklist](./security-checklist.md)** - Security validation checklist for main.bicep
+- **Automated Security Scanning** - PSRule, Checkov, and secret detection in CI/CD
+- **Policy as Code** - Azure Policy integration for compliance
+- **Security Baseline** - CIS Azure Foundations Benchmark compliance
+
+---
+
 For all details about the WebApp-ACR-templates catalog and deployment, please see [README_ADE.md](./environments/WebApp-ACR-templates/README_ADE.md).
