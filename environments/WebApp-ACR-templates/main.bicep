@@ -15,6 +15,14 @@ module network 'network.bicep' = {
   }
 }
 
+module acr 'acr.bicep' = {
+  name: 'acr'
+  params: {
+    envName: envName
+    location: location
+  }
+}
+
 module keyvault 'keyvault.bicep' = {
   name: 'keyvault'
   params: {
@@ -49,7 +57,8 @@ module appService 'appService.bicep' = {
     keyVaultId: keyvault.outputs.keyVaultId
     sqlServerName: sql.outputs.sqlServerName
     appInsightsInstrumentationKey: appInsights.outputs.instrumentationKey
-    vnetId: network.outputs.vnetId
+    appServiceSubnetId: network.outputs.appServiceSubnetId
+    acrLoginServer: acr.outputs.acrLoginServer
     location: location
   }
 }
