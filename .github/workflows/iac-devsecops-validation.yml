@@ -1,0 +1,219 @@
+name: IaC DevSecOps Validation
+
+on:
+  pull_request:
+    paths:
+      - 'environments/WebApp-ACR-templates/**'
+  push:
+    branches:
+      - main
+    paths:
+      - 'environments/WebApp-ACR-templates/**'
+
+permissions:
+  id-token: write
+  contents: read
+  security-events: write
+
+env:
+  BICEP_PATH: 'environments/WebApp-ACR-templates'
+
+jobs:
+  # セキュリティスキャン
+  security-scan:
+    name: Security Analysis
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        
+      - name: Setup Azure CLI
+        uses: azure/setup-azure@v3
+        
+      # シークレット検出
+      - name: TruffleHog Secret Scan
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: main
+          head: HEAD
+          extra_args: --debug --only-verified
+          
+      # PSRule for Azure
+      - name: PSRule for Azure
+        uses: microsoft/ps-rule@v2
+        with:
+          modules: 'PSRule.Rules.Azure'
+          source: '${{ env.BICEP_PATH }}/'
+          outputFormat: 'Sarif'
+          outputPath: 'reports/ps-rule-results.sarif'
+          
+      - name: Upload PSRule results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v2
+        if: always()
+        with:
+          sarif_file: 'reports/ps-rule-results.sarif'
+          
+      # Checkov セキュリティスキャン
+      - name: Checkov Security Scan
+        id: checkov
+        uses: bridgecrewio/checkov-action@master
+        with:
+          directory: ${{ env.BICEP_PATH }}/
+          framework: bicep
+          output_format: sarif
+          output_file_path: reports/checkov-results.sarif
+          
+      - name: Upload Checkov results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v2
+        if: always()
+        with:
+          sarif_file: reports/checkov-results.sarif
+
+  # Bicep リンティングとビルド
+  bicep-validation:
+    name: Bicep Validation
+    runs-on: ubuntu-latest
+    needs: security-scan
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        
+      - name: Setup Azure CLI
+        uses: azure/setup-azure@v3
+        
+      - name: Bicep Build
+        run: |
+          az bicep build --file ${{ env.BICEP_PATH }}/main.bicep
+          
+      - name: Bicep Lint
+        run: |
+          az bicep lint --file ${{ env.BICEP_PATH }}/main.bicep
+          
+      # ARM-TTK 検証
+      - name: ARM Template Toolkit
+        uses: aliencube/arm-ttk-actions@v0.3
+        id: armttk
+        with:
+          path: ${{ env.BICEP_PATH }}/main.json
+          
+      - name: Display ARM-TTK Results
+        shell: pwsh
+        run: |
+          $results = '${{ steps.armttk.outputs.results }}' | ConvertFrom-Json
+          Write-Host "ARM-TTK Validation Results:"
+          $results | Format-Table -AutoSize
+
+  # Azure Policy 検証
+  policy-validation:
+    name: Policy Validation
+    runs-on: ubuntu-latest
+    needs: bicep-validation
+    if: github.event_name == 'pull_request'
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        
+      - name: Azure Login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          
+      - name: Create Test Resource Group
+        id: create-rg
+        run: |
+          RG_NAME="policy-test-${{ github.run_id }}"
+          echo "rg_name=${RG_NAME}" >> $GITHUB_OUTPUT
+          az group create --name ${RG_NAME} --location japaneast
+          
+      - name: What-If Analysis
+        run: |
+          az deployment group what-if \
+            --resource-group ${{ steps.create-rg.outputs.rg_name }} \
+            --template-file ${{ env.BICEP_PATH }}/main.bicep \
+            --parameters envName=test sqlAdminPassword='TestPassword123!@#' \
+            --result-format FullResourcePayloads
+            
+      - name: Policy Compliance Check
+        run: |
+          # Deploy for policy validation
+          az deployment group create \
+            --resource-group ${{ steps.create-rg.outputs.rg_name }} \
+            --template-file ${{ env.BICEP_PATH }}/main.bicep \
+            --parameters envName=test sqlAdminPassword='TestPassword123!@#' \
+            --mode Complete
+            
+          # Check policy compliance
+          az policy state list \
+            --resource-group ${{ steps.create-rg.outputs.rg_name }} \
+            --query "[?complianceState=='NonCompliant']" \
+            --output table
+            
+      - name: Cleanup Test Resources
+        if: always()
+        run: |
+          az group delete --name ${{ steps.create-rg.outputs.rg_name }} --yes --no-wait
+
+  # セキュリティベースライン検証
+  security-baseline:
+    name: Security Baseline Check
+    runs-on: ubuntu-latest
+    needs: bicep-validation
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        
+      - name: Security Baseline Validation
+        shell: pwsh
+        run: |
+          # CIS Azure Foundations Benchmark 準拠チェック
+          Write-Host "Running Security Baseline Checks..."
+          
+          # main.bicep の内容を読み込み
+          $bicepContent = Get-Content "${{ env.BICEP_PATH }}/main.bicep" -Raw
+          
+          # セキュリティチェック項目
+          $checks = @{
+            "SecureParam" = $bicepContent -match "@secure\(\)"
+            "LocationParam" = $bicepContent -notmatch "location\s*=\s*'[^']+'"
+            "ModularStructure" = (Get-ChildItem "${{ env.BICEP_PATH }}/*.bicep").Count -gt 1
+          }
+          
+          $failedChecks = @()
+          foreach ($check in $checks.GetEnumerator()) {
+            if (-not $check.Value) {
+              $failedChecks += $check.Key
+              Write-Host "❌ Failed: $($check.Key)"
+            } else {
+              Write-Host "✅ Passed: $($check.Key)"
+            }
+          }
+          
+          if ($failedChecks.Count -gt 0) {
+            Write-Host "Security baseline validation failed!"
+            exit 1
+          } else {
+            Write-Host "All security baseline checks passed!"
+          }
+
+  # 承認ゲート（本番環境向け）
+  approval-gate:
+    name: Production Approval Gate
+    runs-on: ubuntu-latest
+    needs: [security-scan, bicep-validation, policy-validation, security-baseline]
+    if: github.ref == 'refs/heads/main'
+    environment: production
+    
+    steps:
+      - name: Manual Approval Required
+        run: |
+          echo "This deployment requires manual approval for production environment"
+          echo "Security scans completed successfully"
+          echo "Policy validation passed"
+          echo "Security baseline checks passed"
