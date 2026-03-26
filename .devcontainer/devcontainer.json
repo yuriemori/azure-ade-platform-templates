@@ -1,0 +1,21 @@
+{
+  "name": "general-settings",
+  "image": "mcr.microsoft.com/devcontainers/universal:2",
+  "features": {
+    "ghcr.io/devcontainers/features/azure-cli:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers/features/copilot-cli:1": {}
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "openai.chatgpt",
+        "github.copilot",
+        "github.copilot-chat"
+      ],
+      "settings": {
+        "github.copilot.chat.claudeAgent.enabled": true
+      }
+    }
+  }
+}
